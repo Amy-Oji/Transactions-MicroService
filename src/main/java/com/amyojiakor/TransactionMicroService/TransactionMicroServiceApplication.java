@@ -9,12 +9,6 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 public class TransactionMicroServiceApplication {
 
-	@Bean
-	@LoadBalanced
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
-
 	public static void main(String[] args) {
 		SpringApplication.run(TransactionMicroServiceApplication.class, args);
 	}
