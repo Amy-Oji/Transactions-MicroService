@@ -30,9 +30,8 @@ public class TransactionServiceImplementation implements TransactionService {
     @Override
     public TransactionResponse transact(TransactionRequest transactionRequest) throws Exception {
 
-        String url = apiConfig.getAccountServiceBaseUrl() + "get-account/"+ transactionRequest.accountNumber();
 
-        AccountResponse accountResponse = restTemplate.getForObject(url, AccountResponse.class, transactionRequest.accountNumber());
+        AccountResponse accountResponse = getAccount(transactionRequest.accountNumber());
         Transaction transaction = new Transaction();
         if(accountResponse != null){
             transaction.setAccountBalBeforeTransaction(accountResponse.accountBalance());
@@ -70,5 +69,12 @@ public class TransactionServiceImplementation implements TransactionService {
         transactionRepository.save(transaction);
 
         return response;
+    }
+
+    private AccountResponse getAccount(String accountNum){
+
+        String url = apiConfig.getAccountServiceBaseUrl() + "get-account/"+ accountNum;
+
+        return restTemplate.getForObject(url, AccountResponse.class,accountNum);
     }
 }
