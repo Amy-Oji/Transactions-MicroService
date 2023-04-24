@@ -30,8 +30,8 @@ public class TransactionServiceImplementation implements TransactionService {
     @Override
     public TransactionResponse transact(TransactionRequest transactionRequest) throws Exception {
 
-
         AccountResponse accountResponse = getAccount(transactionRequest.accountNumber());
+
         Transaction transaction = new Transaction();
         if(accountResponse != null){
             transaction.setAccountBalBeforeTransaction(accountResponse.accountBalance());
@@ -53,9 +53,18 @@ public class TransactionServiceImplementation implements TransactionService {
         transaction.setTransactionType(transactionRequest.transactionType());
         transaction.setAccountNum(transactionRequest.accountNumber());
         transaction.setTransactionDateTime(LocalDateTime.now());
-
+        transactionRepository.save(transaction);
         assert accountResponse != null;
-        TransactionResponse response = new TransactionResponse(
+        return setTransactionResponse(transaction, accountResponse, transactionRequest);
+    }
+
+    private AccountResponse getAccount(String accountNum){
+        String url = apiConfig.getAccountServiceBaseUrl() + "get-account/"+ accountNum;
+        return restTemplate.getForObject(url, AccountResponse.class,accountNum);
+    }
+
+    private TransactionResponse setTransactionResponse(Transaction transaction, AccountResponse accountResponse, TransactionRequest transactionRequest){
+        return new TransactionResponse(
                 transaction.getStatus(),
                 accountResponse.accountNumber(),
                 accountResponse.accountName(),
@@ -64,17 +73,8 @@ public class TransactionServiceImplementation implements TransactionService {
                 transactionRequest.transactionType(),
                 transactionRequest.description(),
                 transaction.getAccountBalAfterTransaction()
-                );
-
-        transactionRepository.save(transaction);
-
-        return response;
+        );
     }
 
-    private AccountResponse getAccount(String accountNum){
 
-        String url = apiConfig.getAccountServiceBaseUrl() + "get-account/"+ accountNum;
-
-        return restTemplate.getForObject(url, AccountResponse.class,accountNum);
-    }
 }
