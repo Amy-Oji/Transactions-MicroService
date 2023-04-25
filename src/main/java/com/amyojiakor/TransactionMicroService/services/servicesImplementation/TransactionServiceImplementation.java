@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -22,7 +21,6 @@ import java.time.LocalDateTime;
 public class TransactionServiceImplementation implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final ApiConfig apiConfig;
-
     private final RestTemplate restTemplate;
 
 
@@ -34,17 +32,17 @@ public class TransactionServiceImplementation implements TransactionService {
 
         Transaction transaction = new Transaction();
         if(accountResponse != null){
-            transaction.setAccountBalBeforeTransaction(accountResponse.accountBalance());
+            transaction.setPreviousBalance(accountResponse.accountBalance());
 //            BigDecimal balance = transaction.getAccountBalBeforeTransaction();
             if(transactionRequest.transactionType().equals(TransactionType.CREDIT)) {
-                transaction.setAccountBalAfterTransaction(transaction.getAccountBalBeforeTransaction().add(transactionRequest.amount()));
+                transaction.setNewBalance(transaction.getPreviousBalance().add(transactionRequest.amount()));
                 transaction.setStatus(TransactionStatus.COMPLETED);
             }else{
-                if(transactionRequest.amount().compareTo(transaction.getAccountBalBeforeTransaction()) > 0){
+                if(transactionRequest.amount().compareTo(transaction.getPreviousBalance()) > 0){
                     transaction.setStatus(TransactionStatus.FAILED);
                     throw new Exception("Insufficient Funds");
                 }
-                transaction.setAccountBalAfterTransaction(transaction.getAccountBalBeforeTransaction().subtract(transactionRequest.amount()));
+                transaction.setNewBalance(transaction.getPreviousBalance().subtract(transactionRequest.amount()));
                 transaction.setStatus(TransactionStatus.COMPLETED);
             }
         }
@@ -72,7 +70,7 @@ public class TransactionServiceImplementation implements TransactionService {
                 accountResponse.currencyCode(),
                 transactionRequest.transactionType(),
                 transactionRequest.description(),
-                transaction.getAccountBalAfterTransaction()
+                transaction.getNewBalance()
         );
     }
 

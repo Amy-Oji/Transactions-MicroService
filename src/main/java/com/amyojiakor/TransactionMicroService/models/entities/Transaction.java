@@ -22,9 +22,9 @@ public class Transaction {
 
     private String accountNum;
 
-    private BigDecimal accountBalBeforeTransaction;
+    private BigDecimal previousBalance;
 
-    private BigDecimal accountBalAfterTransaction;
+    private BigDecimal newBalance;
 
     @Enumerated(value = EnumType.STRING)
     private TransactionType transactionType;
