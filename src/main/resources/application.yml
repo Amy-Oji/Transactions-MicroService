@@ -23,6 +23,22 @@ spring:
         format-sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    kafka:
+      bootstrap-servers: localhost:9092
+      consumer:
+        group-id: my-consumer-group
+        auto-offset-reset: earliest
+      producer:
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      jackson:
+        serialization:
+          FAIL_ON_EMPTY_BEANS: false
+
+kafka:
+  topic:
+    transaction-creation: transaction-creation
+
 myapp:
   api:
     base-url:

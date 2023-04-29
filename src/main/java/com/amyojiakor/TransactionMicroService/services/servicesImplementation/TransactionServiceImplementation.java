@@ -1,6 +1,6 @@
 package com.amyojiakor.TransactionMicroService.services.servicesImplementation;
 
-import com.amyojiakor.TransactionMicroService.apiConfig.ApiConfig;
+import com.amyojiakor.TransactionMicroService.config.ApiConfig;
 import com.amyojiakor.TransactionMicroService.models.entities.Transaction;
 import com.amyojiakor.TransactionMicroService.models.enums.TransactionStatus;
 import com.amyojiakor.TransactionMicroService.models.enums.TransactionType;
