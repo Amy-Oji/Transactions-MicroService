@@ -27,5 +27,4 @@ myapp:
   api:
     base-url:
       accounts-service: http://account-service/api/v1/accounts/
-
-      transactions-service: http://user-service/api/v1/users/
+      user-service: http://user-service/api/v1/users/

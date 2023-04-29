@@ -14,8 +14,8 @@ public class ApiConfig {
     @Value("${myapp.api.base-url.accounts-service}")
     private String accountServiceBaseUrl;
 
-    @Value("${myapp.api.base-url.transactions-service}")
-    private String transactionsServiceBaseUrl;
+    @Value("${myapp.api.base-url.user-service}")
+    private String userServiceBaseUrl;
 
     @Bean
     @LoadBalanced
@@ -28,7 +28,7 @@ public class ApiConfig {
         return accountServiceBaseUrl;
     }
 
-    public String getTransactionsServiceBaseUrl() {
-        return transactionsServiceBaseUrl;
+    public String getUserServiceBaseUrl() {
+        return userServiceBaseUrl;
     }
 }

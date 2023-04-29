@@ -9,7 +9,7 @@ import com.amyojiakor.TransactionMicroService.models.enums.TransactionType;
 
 import java.math.BigDecimal;
 
-public record TransactionResponse(TransactionStatus status, String accountNumber, String accountName, AccountType accountType, CurrencyCode currencyCode, TransactionType transactionType, String description, BigDecimal accountBalance ) {
+public record TransactionResponse(TransactionStatus status, String accountNumber, AccountType accountType, CurrencyCode currencyCode, TransactionType transactionType, String description, BigDecimal accountBalance ) {
 
 
 }
