@@ -9,10 +9,13 @@ import com.amyojiakor.TransactionMicroService.repositories.TransactionRepository
 import com.amyojiakor.TransactionMicroService.services.TransactionService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,11 +24,23 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class TransactionServiceImplementation implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final ApiConfig apiConfig;
     private final RestTemplate restTemplate;
+    private final String transactionCreationTopic;
+
+    private final KafkaTemplate<String, TransactionMessage> kafkaTemplate;
+
+    @Autowired
+    public TransactionServiceImplementation(TransactionRepository transactionRepository, ApiConfig apiConfig, RestTemplate restTemplate,  @Value("${kafka.topic.transaction-creation}") String transactionCreationTopic, KafkaTemplate<String, TransactionMessage> kafkaTemplate) {
+        this.transactionRepository = transactionRepository;
+        this.apiConfig = apiConfig;
+        this.restTemplate = restTemplate;
+        this.transactionCreationTopic = transactionCreationTopic;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     @Transactional
     @Override
@@ -40,6 +55,10 @@ public class TransactionServiceImplementation implements TransactionService {
         if (account == null) {
             throw new Exception("No such account");
         }
+
+        TransactionMessage message = new TransactionMessage(account.accountNumber(), transactionRequest.transactionType(), transactionRequest.amount());
+
+        kafkaTemplate.send(transactionCreationTopic, message);
 
         Transaction transaction = createTransaction(transactionRequest, account);
 
