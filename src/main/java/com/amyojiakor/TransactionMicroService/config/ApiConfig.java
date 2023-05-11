@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class ApiConfig {
-    @Value("${myapp.api.base-url.accounts-service}")
+    @Value("${myapp.api.base-url.account-service}")
     private String accountServiceBaseUrl;
 
     @Value("${myapp.api.base-url.user-service}")

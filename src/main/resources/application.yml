@@ -26,7 +26,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: my-consumer-group
+      group-id: transactions-consumer-group
       auto-offset-reset: earliest
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -37,10 +37,14 @@ spring:
 
 kafka:
   topic:
-    transaction-creation: transaction-creation
+    transaction:
+      creation: transaction-creation
+      balance-update:
+#        user-service: user-service-balance-update
+        account-service: account-service-balance-update
 
 myapp:
   api:
     base-url:
-      accounts-service: http://account-service/api/v1/accounts/
+      account-service: http://account-service/api/v1/accounts/
       user-service: http://user-service/api/v1/users/
