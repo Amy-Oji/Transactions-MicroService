@@ -20,21 +20,25 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String accountNum;
+    private BigDecimal amount;
 
-    private BigDecimal previousBalance;
+    private String sourceAccountNumber;
 
-    private BigDecimal newBalance;
+    private String recipientAccountNumber;
+
+    private BigDecimal sourceAccountPreviousBalance;
+
+    private BigDecimal sourceAccountNewBalance;
 
     @Enumerated(value = EnumType.STRING)
     private TransactionType transactionType;
 
-    private BigDecimal amount;
+    private String description;
 
     private LocalDateTime TransactionDateTime;
 
+    private String referenceNumber;
+
     @Enumerated(value = EnumType.STRING)
     private TransactionStatus status;
-
-    private String description;
 }
