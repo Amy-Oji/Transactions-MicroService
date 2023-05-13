@@ -1,16 +1,23 @@
 package com.amyojiakor.TransactionMicroService.models.payloads;
 
-import com.amyojiakor.TransactionMicroService.models.enums.AccountType;
-import com.amyojiakor.TransactionMicroService.models.enums.CurrencyCode;
 import com.amyojiakor.TransactionMicroService.models.enums.TransactionStatus;
 import com.amyojiakor.TransactionMicroService.models.enums.TransactionType;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-public record TransferResponse(TransactionStatus status,
-                               String sourceAccountNumber,
-                               String recipientAccountNumber,
-                               TransactionType transactionType,
-                               String description,
-                               BigDecimal sourceAccountNewBalance ) {
+@Data
+@NoArgsConstructor
+public class TransferResponse {
+    private BigDecimal amount;
+    private String sourceAccountNumber;
+    private String recipientAccountNumber;
+    private TransactionType transactionType;
+    private String description;
+    private LocalDateTime TransactionDateTime;
+    private TransactionStatus status;
+    private BigDecimal sourceAccountNewBalance;
+    private String referenceNumber;
 }
