@@ -7,6 +7,6 @@ import com.amyojiakor.TransactionMicroService.models.enums.CurrencyCode;
 import java.math.BigDecimal;
 
 
-public record UserAccounts (String accountNumber, AccountType accountType, CurrencyCode currencyCode, BigDecimal accountBalance){
+public record AccountDetails(String accountNumber, AccountType accountType, CurrencyCode currencyCode, BigDecimal accountBalance){
 
 }
