@@ -1,5 +1,6 @@
 package com.amyojiakor.TransactionMicroService.models.entities;
 
+import com.amyojiakor.TransactionMicroService.models.enums.CurrencyCode;
 import com.amyojiakor.TransactionMicroService.models.enums.TransactionStatus;
 import com.amyojiakor.TransactionMicroService.models.enums.TransactionType;
 import jakarta.persistence.*;
@@ -30,8 +31,15 @@ public class Transaction {
 
     private BigDecimal sourceAccountNewBalance;
 
+    private BigDecimal recipientAccountPreviousBalance;
+
+    private BigDecimal recipientAccountNewBalance;
+
     @Enumerated(value = EnumType.STRING)
     private TransactionType transactionType;
+
+    @Enumerated(value = EnumType.STRING)
+    private CurrencyCode currencyCode;
 
     private String description;
 
