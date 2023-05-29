@@ -2,6 +2,7 @@ package com.amyojiakor.TransactionMicroService.services.servicesImplementation;
 
 import com.amyojiakor.TransactionMicroService.config.ApiConfig;
 import com.amyojiakor.TransactionMicroService.models.entities.Transaction;
+import com.amyojiakor.TransactionMicroService.models.enums.CurrencyCode;
 import com.amyojiakor.TransactionMicroService.models.enums.TransactionStatus;
 import com.amyojiakor.TransactionMicroService.models.enums.TransactionType;
 import com.amyojiakor.TransactionMicroService.models.payloads.*;
@@ -33,14 +34,27 @@ public class TransactionServiceImplementation implements TransactionService {
     private final RestTemplate restTemplate;
     private final String transactionCreationTopic;
     private final KafkaTemplate<String, TransactionMessage> kafkaTemplate;
+    private final KafkaTemplate<String, CreditAccountMessage> creditAccountKafkaTemplate;
+    private final String creditAccountTopic;
+
+
+
+
 
     @Autowired
-    public TransactionServiceImplementation(TransactionRepository transactionRepository, ApiConfig apiConfig, RestTemplate restTemplate,  @Value("${kafka.topic.transaction.creation}") String transactionCreationTopic, KafkaTemplate<String, TransactionMessage> kafkaTemplate) {
+    public TransactionServiceImplementation(TransactionRepository transactionRepository,
+                                            ApiConfig apiConfig, RestTemplate restTemplate,
+                                            @Value("${kafka.topic.transaction.creation}") String transactionCreationTopic,
+                                            KafkaTemplate<String, TransactionMessage> kafkaTemplate,
+                                            KafkaTemplate<String, CreditAccountMessage> creditAccountKafkaTemplate,
+                                            @Value("${kafka.topic.transaction.credit-account}") String creditAccountTopic) {
         this.transactionRepository = transactionRepository;
         this.apiConfig = apiConfig;
         this.restTemplate = restTemplate;
         this.transactionCreationTopic = transactionCreationTopic;
         this.kafkaTemplate = kafkaTemplate;
+        this.creditAccountKafkaTemplate = creditAccountKafkaTemplate;
+        this.creditAccountTopic = creditAccountTopic;
     }
 
     @Transactional
@@ -128,6 +142,7 @@ public class TransactionServiceImplementation implements TransactionService {
         );
     }
     @Override
+    @Transactional
     public TransferResponse transfer(TransferRequest transferRequest, String token) throws Exception {
 
         TransferResponse transferResponse = new TransferResponse();
@@ -138,10 +153,8 @@ public class TransactionServiceImplementation implements TransactionService {
             throw new Exception("Invalid Source Account");
         }
 
-        AccountDetails recipientAccount = null;
-
         if (transferRequest.transactionType().equals(TransactionType.INTERNAL_TRANSFER)){
-            recipientAccount = getAccount(transferRequest.recipientAccountNumber());
+            AccountDetailsApiResponse recipientAccount = getAccount(transferRequest.recipientAccountNumber());
             if (recipientAccount== null){
                 throw new Exception("Invalid Recipient Account");
             }
@@ -150,6 +163,42 @@ public class TransactionServiceImplementation implements TransactionService {
             kafkaTemplate.send(transactionCreationTopic, message);
         }
         return transferResponse;
+    }
+
+    @Override
+    @Transactional
+    public CreditResponse creditAccount(CreditRequest request) throws Exception {
+
+        Transaction transaction = new Transaction();
+        CreditResponse creditResponse = new CreditResponse();
+        CreditAccountMessage creditAccountMessage = new CreditAccountMessage();
+
+        var account = getAccount(request.recipientAccountNumber());
+
+        if(!request.currencyCode().equals(account.currencyCode())){
+            throw new Exception("Currency Code does not match");
+        }
+
+        String ref = generateReferenceNumber();
+        while(!isUnique(ref)) ref = generateReferenceNumber();
+
+        transaction.setReferenceNumber(ref);
+        transaction.setStatus(TransactionStatus.PENDING);
+        transaction.setTransactionDateTime(LocalDateTime.now());
+
+        BeanUtils.copyProperties(request, transaction);
+
+        BeanUtils.copyProperties(request, creditResponse);
+        creditResponse.setAmountSent(request.amount());
+        creditResponse.setStatus(TransactionStatus.PENDING);
+
+        BeanUtils.copyProperties(transaction, creditAccountMessage);
+
+        transactionRepository.save(transaction);
+
+        creditAccountKafkaTemplate.send(creditAccountTopic, creditAccountMessage);
+
+        return creditResponse;
     }
 
     private TransferResponse processInternalTransfer(TransferRequest transferRequest, AccountDetails sourceAccount) throws Exception {
@@ -184,10 +233,10 @@ public class TransactionServiceImplementation implements TransactionService {
         return transaction;
     }
 
-    private AccountDetails getAccount(String accountNumber){
+    private AccountDetailsApiResponse getAccount(String accountNumber){
         return restTemplate.getForObject(
                 apiConfig.getAccountServiceBaseUrl()+"get-account/{accountNumber}",
-                AccountDetails.class, accountNumber);
+                AccountDetailsApiResponse.class, accountNumber);
     }
 
     private String generateReferenceNumber() {
@@ -215,4 +264,7 @@ public class TransactionServiceImplementation implements TransactionService {
 
         System.out.println(LocalDateTime.now()+ "====response time======");
     }
+
+
+
 }

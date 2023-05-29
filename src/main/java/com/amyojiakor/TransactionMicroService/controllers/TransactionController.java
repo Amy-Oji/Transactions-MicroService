@@ -1,5 +1,7 @@
 package com.amyojiakor.TransactionMicroService.controllers;
 
+import com.amyojiakor.TransactionMicroService.flutter.TransferService;
+import com.amyojiakor.TransactionMicroService.models.payloads.CreditRequest;
 import com.amyojiakor.TransactionMicroService.models.payloads.TransactionRequest;
 import com.amyojiakor.TransactionMicroService.models.payloads.TransferRequest;
 import com.amyojiakor.TransactionMicroService.services.TransactionService;
@@ -17,6 +19,7 @@ public class TransactionController {
     @Autowired
     private final TransactionService transactionService;
 
+
     @PostMapping("/transact")
     public ResponseEntity<?> transact(@RequestBody TransactionRequest transactionRequest, @RequestHeader("Authorization") String token) throws Exception {
         String encodedToken = Base64.getUrlEncoder().withoutPadding().encodeToString(token.getBytes());
@@ -27,5 +30,10 @@ public class TransactionController {
     public ResponseEntity<?> transfer(@RequestBody TransferRequest transferRequest, @RequestHeader("Authorization") String token) throws Exception {
         String encodedToken = Base64.getUrlEncoder().withoutPadding().encodeToString(token.getBytes());
         return ResponseEntity.ok(transactionService.transfer(transferRequest, encodedToken));
+    }
+
+    @PostMapping("/credit")
+    public ResponseEntity<?> creditAccount(@RequestBody CreditRequest creditRequest) throws Exception {
+        return ResponseEntity.ok(transactionService.creditAccount(creditRequest));
     }
 }
