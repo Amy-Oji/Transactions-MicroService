@@ -13,5 +13,6 @@ public class CreditResponse {
     private String recipientAccountNumber;
     private CurrencyCode currencyCode;
     private BigDecimal amountSent;
+    private String senderName;
     private String description;
 }

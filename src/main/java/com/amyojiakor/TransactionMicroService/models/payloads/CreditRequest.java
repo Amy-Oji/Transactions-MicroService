@@ -5,5 +5,10 @@ import com.amyojiakor.TransactionMicroService.models.enums.TransactionType;
 
 import java.math.BigDecimal;
 
-public record CreditRequest(String recipientAccountNumber, TransactionType transactionType, CurrencyCode currencyCode, BigDecimal amount, String senderName, String description) {
+public record CreditRequest(String recipientAccountNumber,
+                            TransactionType transactionType,
+                            CurrencyCode currencyCode,
+                            BigDecimal amount,
+                            String senderName,
+                            String description) {
 }
