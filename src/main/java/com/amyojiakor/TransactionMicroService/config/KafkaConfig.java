@@ -1,5 +1,7 @@
 package com.amyojiakor.TransactionMicroService.config;
 
+import com.amyojiakor.TransactionMicroService.models.payloads.CreditAccountMessage;
+import com.amyojiakor.TransactionMicroService.models.payloads.CreditAccountMessageResponse;
 import com.amyojiakor.TransactionMicroService.models.payloads.TransactionMessage;
 import com.amyojiakor.TransactionMicroService.models.payloads.TransactionMessageResponse;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -42,6 +44,20 @@ public class KafkaConfig {
     @Bean
     public KafkaTemplate<String, TransactionMessage> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
+    }
+
+    @Bean
+    public ProducerFactory<String, CreditAccountMessage> accountProducerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+
+    @Bean
+    public KafkaTemplate<String, CreditAccountMessage> creditAccountKafkaTemplate() {
+        return new KafkaTemplate<>(accountProducerFactory());
     }
 
     @Bean
