@@ -265,6 +265,14 @@ public class TransactionServiceImplementation implements TransactionService {
         System.out.println(LocalDateTime.now()+ "====response time======");
     }
 
-
+    @Transactional
+    @KafkaListener(topics = "${kafka.topic.transaction.credit-account-response}", groupId = "${spring.kafka.consumer.group-id}", containerFactory = "creditTransactionListenerContainerFactory")
+    public void consume(CreditAccountMessageResponse creditAccountMessageResponse) throws Exception {
+        System.out.println(creditAccountMessageResponse);
+        var transaction = transactionRepository.findByReferenceNumber(creditAccountMessageResponse.getReferenceNumber()).orElseThrow();
+        transaction.setRecipientAccountNewBalance(creditAccountMessageResponse.getRecipientAccountNumberNewBal());
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        transactionRepository.save(transaction);
+    }
 
 }

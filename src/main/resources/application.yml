@@ -39,6 +39,8 @@ kafka:
   topic:
     transaction:
       creation: transaction-creation
+      credit-account: credit-account
+      credit-account-response: account-service-credit-response
       balance-update:
 #        user-service: user-service-balance-update
         account-service: account-service-balance-update

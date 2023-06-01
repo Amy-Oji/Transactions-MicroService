@@ -77,4 +77,12 @@ public class KafkaConfig {
         factory.setConsumerFactory(new DefaultKafkaConsumerFactory<>(consumerFactory(), new StringDeserializer(), new JsonDeserializer<>(TransactionMessageResponse.class, false)));
         return factory;
     }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, CreditAccountMessageResponse> creditTransactionListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, CreditAccountMessageResponse> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(new DefaultKafkaConsumerFactory<>(consumerFactory(), new StringDeserializer(), new JsonDeserializer<>(CreditAccountMessageResponse.class, false)));
+        return factory;
+    }
 }
